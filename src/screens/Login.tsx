@@ -1,11 +1,15 @@
-import { isLoggedInVar } from "../apollo";
+import styled from "styled-components";
+
+const Title = styled.h1`
+  color: ${(props) => props.theme.fontColor};
+`;
+const Container = styled.div``;
 
 const Login = () => {
   return (
-    <div>
-      <h1>Login</h1>
-      <button onClick={() => isLoggedInVar(true)}>Log in!</button>
-    </div>
+    <Container>
+      <Title>Login</Title>
+    </Container>
   );
 };
 

@@ -1,6 +1,9 @@
 # Instaclone Web
 
--[x] Router -[x] Authentication
--[] Architect
--[] Styles
-(Theory part)
+- [x] Router
+- [x] Authentication
+- [x] Architect
+- [x] Styles
+      (Theory part)
+
+- [] Log In / Sign up
