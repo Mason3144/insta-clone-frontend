@@ -7,3 +7,6 @@
       (Theory part)
 
 - [] Log In / Sign up
+- [ ] Feed
+- [ ] Profile
+- [ ] See Hashtag
