@@ -3,7 +3,7 @@ import {
   faInstagram,
 } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 import AuthLayout from "../components/auth/AuthLayout";
 import BottomBox from "../components/auth/BottomBox";
@@ -31,7 +31,7 @@ const Login = () => {
   const { register, handleSubmit, formState } = useForm<FormData>({
     mode: "onBlur",
   });
-  const onSubmitValid = (data: FormData) => {};
+  const onSubmitValid: SubmitHandler<FormData> = (data) => {};
 
   // console.log(formState.errors);
   return (
