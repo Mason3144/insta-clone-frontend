@@ -6,7 +6,7 @@
 - [x] Styles
       (Theory part)
 
-- [] Log In / Sign up
+- [x] Log In / Sign up
 - [ ] Feed
 - [ ] Profile
 - [ ] See Hashtag
