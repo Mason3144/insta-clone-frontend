@@ -11,6 +11,7 @@ const Button = styled.input`
   font-weight: 600;
   width: 100%;
   opacity: ${(props) => (props.disabled ? "0.4" : "1")};
+  cursor: ${(props) => (props.disabled ? "default" : "pointer")};
 `;
 
 export default Button;

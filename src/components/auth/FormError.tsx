@@ -12,7 +12,6 @@ const SFormError = styled.span`
 `;
 
 const FormError = ({ message }: IProps) => {
-  console.log(message);
   return !message ? null : <SFormError>{message}</SFormError>;
 };
 export default FormError;

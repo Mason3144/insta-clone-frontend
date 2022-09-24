@@ -10,3 +10,5 @@
 - [ ] Feed
 - [ ] Profile
 - [ ] See Hashtag
+
+- [ ] Username, Password, Email restriction (login and signup part in frontend and backend)
