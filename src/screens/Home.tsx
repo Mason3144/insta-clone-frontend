@@ -3,7 +3,6 @@ import { logUserOut } from "../apollo";
 
 const Home = () => {
   const history = useHistory();
-  console.log(history);
   return (
     <div>
       <h1>Home</h1>
