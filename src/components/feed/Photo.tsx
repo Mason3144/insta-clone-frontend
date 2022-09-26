@@ -75,16 +75,36 @@ const TOGGLE_LIKE_MUTATION = gql`
     toggleLike(id: $id) {
       ok
       error
-      token
     }
   }
 `;
 
 const Photo = ({ id, user, file, isLiked, likes }: IProps) => {
-  const [toggleLikeMutation, { loading }] = useMutation(TOGGLE_LIKE_MUTATION, {
+  const updateToggleLike = (cache: any, { data }: any) => {
+    const {
+      toggleLike: { ok },
+    } = data;
+    if (ok) {
+      cache.writeFragment({
+        id: `Photo:${id}`,
+        fragment: gql`
+          fragment BSName on Photo {
+            isLiked
+            likes
+          }
+        `,
+        data: {
+          isLiked: !isLiked,
+          likes: isLiked ? likes - 1 : likes + 1,
+        },
+      });
+    }
+  };
+  const [toggleLikeMutation] = useMutation(TOGGLE_LIKE_MUTATION, {
     variables: {
       id,
     },
+    update: updateToggleLike,
   });
   return (
     <PhotoContainer key={id}>
