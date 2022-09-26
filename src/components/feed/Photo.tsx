@@ -10,6 +10,7 @@ import styled from "styled-components";
 import { FatText } from "../shared";
 import Avatar from "../Avatar";
 import { gql, useMutation } from "@apollo/client";
+import Comments from "./Comments";
 
 const PhotoContainer = styled.div`
   background-color: white;
@@ -62,12 +63,23 @@ interface User {
   avatar: string;
   username: string;
 }
-interface IProps {
+interface UserComments {
+  id: number;
+  payload: string;
+  isMine: boolean;
+  createdAt: string;
+  user: User;
+}
+
+export interface PhotoProps {
   id: number;
   user: User;
   file: string;
   isLiked: boolean;
   likes: number;
+  caption?: string;
+  comments: UserComments[];
+  commentNumber: number;
 }
 
 const TOGGLE_LIKE_MUTATION = gql`
@@ -79,7 +91,16 @@ const TOGGLE_LIKE_MUTATION = gql`
   }
 `;
 
-const Photo = ({ id, user, file, isLiked, likes }: IProps) => {
+const Photo = ({
+  id,
+  user,
+  file,
+  isLiked,
+  likes,
+  caption,
+  commentNumber,
+  comments,
+}: PhotoProps) => {
   const updateToggleLike = (cache: any, { data }: any) => {
     const {
       toggleLike: { ok },
@@ -134,6 +155,12 @@ const Photo = ({ id, user, file, isLiked, likes }: IProps) => {
           </div>
         </PhotoActions>
         <Likes>{likes === 1 ? "1 like" : `${likes} likes`}</Likes>
+        <Comments
+          author={user.username}
+          caption={caption}
+          comments={comments}
+          commentNumber={commentNumber}
+        ></Comments>
       </PhotoData>
     </PhotoContainer>
   );
