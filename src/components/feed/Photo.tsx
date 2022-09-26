@@ -106,19 +106,33 @@ const Photo = ({
       toggleLike: { ok },
     } = data;
     if (ok) {
-      cache.writeFragment({
-        id: `Photo:${id}`,
-        fragment: gql`
-          fragment BSName on Photo {
-            isLiked
-            likes
-          }
-        `,
-        data: {
-          isLiked: !isLiked,
-          likes: isLiked ? likes - 1 : likes + 1,
+      const photoId = `Photo:${id}`;
+      cache.modify({
+        id: photoId,
+        fields: {
+          isLiked(prev: boolean) {
+            return !prev;
+          },
+          likes(prev: number) {
+            return isLiked ? prev - 1 : prev + 1;
+          },
         },
       });
+
+      // new feature to modify cache in Apollo3 is above
+      //   cache.writeFragment({
+      //     id: `Photo:${id}`,
+      //     fragment: gql`
+      //       fragment BSName on Photo {
+      //         isLiked
+      //         likes
+      //       }
+      //     `,
+      //     data: {
+      //       isLiked: !isLiked,
+      //       likes: isLiked ? likes - 1 : likes + 1,
+      //     },
+      //   });
     }
   };
   const [toggleLikeMutation] = useMutation(TOGGLE_LIKE_MUTATION, {
