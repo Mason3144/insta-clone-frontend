@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { FatText } from "../shared";
 
-const CommentContiner = styled.div``;
+const CommentContiner = styled.div`
+  margin-bottom: 7px;
+`;
 const CommentCaption = styled.span`
   margin-left: 10px;
   a {

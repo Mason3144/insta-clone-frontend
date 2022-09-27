@@ -1,8 +1,11 @@
+import { gql, useMutation } from "@apollo/client";
+import { useForm } from "react-hook-form";
 import styled from "styled-components";
+import useUser from "../../hooks/useUser";
 import Comment from "./Comment";
 
 const CommentsContainer = styled.div`
-  margin-top: 30px;
+  margin-top: 20px;
 `;
 
 const CommentCount = styled.span`
@@ -11,6 +14,20 @@ const CommentCount = styled.span`
   display: block;
   font-weight: 600;
   font-size: 12px;
+`;
+
+const PostCommentContainer = styled.div`
+  margin-top: 10px;
+  padding-top: 15px;
+  padding-bottom: 10px;
+  border-top: 1px solid ${(props) => props.theme.borderColor};
+`;
+
+const PostCommentInput = styled.input`
+  width: 100%;
+  &::placeholder {
+    font-size: 12px;
+  }
 `;
 
 interface User {
@@ -30,9 +47,93 @@ interface IProps {
   caption?: string;
   comments: UserComments[];
   commentNumber: number;
+  photoId: number;
 }
 
-const Comments = ({ author, caption, commentNumber, comments }: IProps) => {
+const CREATE_COMMENT_MUTATION = gql`
+  mutation createComment($photoId: Int!, $payload: String!) {
+    createComment(photoId: $photoId, payload: $payload) {
+      ok
+      error
+      id
+    }
+  }
+`;
+
+const Comments = ({
+  author,
+  caption,
+  commentNumber,
+  comments,
+  photoId,
+}: IProps) => {
+  const { data: userData } = useUser();
+  const { register, handleSubmit, setValue, getValues } = useForm();
+  const createCommentUpdate = (cache: any, { data }: any) => {
+    const { payload } = getValues();
+    setValue("payload", "");
+    const {
+      createComment: { ok, id },
+    } = data;
+
+    if (ok && userData?.me) {
+      const newComment = {
+        __typename: "Comment",
+        createdAt: Date.now() + "",
+        id,
+        isMine: true,
+        payload,
+        user: {
+          ...userData.me,
+        },
+        //cache에 있는 photoId를 제외한 모든항목들을 fake로 만들어줌
+        //(backend에서 값을 불러오는게 정확하나 브라우저에서 보여주기만하면 되므로 fake로 만듬)
+        //setValue로 payload리셋을 getValue 후에 와야됨(그렇지않으면 cache의 payload는 empty가 됨)
+        //useMutation은 cache 작업 후에 불러오기(안그러면 type error가 뜸)
+      };
+      const newCacheComment = cache.writeFragment({
+        data: newComment,
+        fragment: gql`
+          fragment BSName on Comment {
+            id
+            createdAt
+            isMine
+            payload
+            user {
+              username
+              avatar
+            }
+          }
+        `,
+      });
+      //SQL DB와 비슷하게 cache에 comment를 생성후 포토에는 그 comment의 id만 ref로 남기기
+      cache.modify({
+        id: `Photo:${photoId}`,
+        fields: {
+          comments(pre: any) {
+            return [...pre, newCacheComment];
+          },
+          commentNumber(pre: any) {
+            return pre + 1;
+          },
+        },
+      });
+    }
+  };
+
+  const [createCommentMutation, { loading }] = useMutation(
+    CREATE_COMMENT_MUTATION,
+    { update: createCommentUpdate }
+  );
+
+  const onValid = ({ payload }: any) => {
+    if (loading) {
+      return;
+    }
+    createCommentMutation({
+      variables: { photoId, payload },
+    });
+  };
   return (
     <CommentsContainer>
       <Comment author={author} caption={caption} />
@@ -46,6 +147,15 @@ const Comments = ({ author, caption, commentNumber, comments }: IProps) => {
           caption={comment.payload}
         />
       ))}
+      <PostCommentContainer>
+        <form onSubmit={handleSubmit(onValid)}>
+          <PostCommentInput
+            {...register("payload", { required: true })}
+            type="text"
+            placeholder="Comment here"
+          ></PostCommentInput>
+        </form>
+      </PostCommentContainer>
     </CommentsContainer>
   );
 };
