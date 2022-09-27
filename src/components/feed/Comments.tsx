@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import useUser from "../../hooks/useUser";
 import Comment from "./Comment";
+import { Cache } from "./Photo";
 
 const CommentsContainer = styled.div`
   margin-top: 20px;
@@ -50,6 +51,10 @@ interface IProps {
   photoId: number;
 }
 
+interface CommentCache {
+  __ref: string;
+}
+
 const CREATE_COMMENT_MUTATION = gql`
   mutation createComment($photoId: Int!, $payload: String!) {
     createComment(photoId: $photoId, payload: $payload) {
@@ -69,7 +74,7 @@ const Comments = ({
 }: IProps) => {
   const { data: userData } = useUser();
   const { register, handleSubmit, setValue, getValues } = useForm();
-  const createCommentUpdate = (cache: any, { data }: any) => {
+  const createCommentUpdate = (cache: Cache, { data }: any) => {
     const { payload } = getValues();
     setValue("payload", "");
     const {
@@ -110,10 +115,10 @@ const Comments = ({
       cache.modify({
         id: `Photo:${photoId}`,
         fields: {
-          comments(pre: any) {
+          comments(pre: CommentCache[]) {
             return [...pre, newCacheComment];
           },
-          commentNumber(pre: any) {
+          commentNumber(pre: number) {
             return pre + 1;
           },
         },
@@ -143,8 +148,11 @@ const Comments = ({
       {comments?.map((comment) => (
         <Comment
           key={comment.id}
+          id={comment.id}
           author={comment.user.username}
           caption={comment.payload}
+          isMine={comment.isMine}
+          photoId={photoId}
         />
       ))}
       <PostCommentContainer>

@@ -7,7 +7,7 @@
       (Theory part)
 
 - [x] Log In / Sign up
-- [ ] Feed
+- [x] Feed
 - [ ] Profile
 - [ ] See Hashtag
 

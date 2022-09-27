@@ -82,6 +82,12 @@ export interface PhotoProps {
   commentNumber: number;
 }
 
+export interface Cache {
+  modify: any;
+  writeFragment: any;
+  evict: any;
+}
+
 const TOGGLE_LIKE_MUTATION = gql`
   mutation toggleLike($id: Int!) {
     toggleLike(id: $id) {
@@ -101,7 +107,7 @@ const Photo = ({
   commentNumber,
   comments,
 }: PhotoProps) => {
-  const updateToggleLike = (cache: any, { data }: any) => {
+  const updateToggleLike = (cache: Cache, { data }: any) => {
     const {
       toggleLike: { ok },
     } = data;
