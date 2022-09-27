@@ -1,4 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
+import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -18,6 +20,10 @@ const CommentCaption = styled.span`
       text-decoration: underline;
     }
   }
+`;
+const DeleteButtone = styled.span`
+  margin-left: 10px;
+  cursor: pointer;
 `;
 
 interface IProps {
@@ -66,7 +72,9 @@ const Comment = ({ author, caption, id, isMine, photoId }: IProps) => {
 
   return (
     <CommentContiner>
-      <FatText>{author}</FatText>
+      <Link to={`/users/${author}`}>
+        <FatText>{author}</FatText>
+      </Link>
       <CommentCaption>
         {caption?.split(" ").map((word, index) =>
           /#[\w]+/.test(word) ? (
@@ -78,7 +86,11 @@ const Comment = ({ author, caption, id, isMine, photoId }: IProps) => {
           )
         )}
       </CommentCaption>
-      {isMine ? <button onClick={() => onDeleteClick()}>X</button> : null}
+      {isMine ? (
+        <DeleteButtone>
+          <FontAwesomeIcon icon={faTrashCan} onClick={() => onDeleteClick()} />
+        </DeleteButtone>
+      ) : null}
     </CommentContiner>
   );
 };
