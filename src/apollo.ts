@@ -49,5 +49,14 @@ const authLink = setContext((_, { headers }) => {
 
 export const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      User: {
+        keyFields: (obj) => `User:${obj.username}`,
+        //cache안의 User의 고유식별자를 username으로 지정(default값은 id)
+        //Home안의 post uploader의 id가 없고 username만 불러오게 하였으므로 cache의 설정을 바꿔
+        //uploader를 cache에서 식별하게함(uploader의 id를 불러오게하면 이처럼 따로 chache 설정을 바꿀필요없음)
+      },
+    },
+  }),
 });
