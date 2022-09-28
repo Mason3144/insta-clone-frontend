@@ -86,6 +86,7 @@ export interface PhotoProps {
 export interface Cache {
   modify: any;
   writeFragment: any;
+  readFragment: any;
   evict: any;
 }
 

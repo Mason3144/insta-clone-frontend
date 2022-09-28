@@ -8,6 +8,8 @@ const ME_QUERY = gql`
       id
       username
       avatar
+      totalFollowers
+      totalFollowing
     }
   }
 `;
@@ -24,6 +26,7 @@ const useUser = () => {
       }
     }
   });
+
   return { data };
 };
 

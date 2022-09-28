@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { PHOTO_FRAGMENT } from "../fragments";
 import { faHeart, faComment } from "@fortawesome/free-solid-svg-icons";
@@ -7,6 +7,7 @@ import styled from "styled-components";
 import { FatText } from "../components/shared";
 import Button from "../components/auth/Button";
 import PageTitle from "../components/PageTitle";
+import useUser from "../hooks/useUser";
 
 const Header = styled.div`
   display: flex;
@@ -91,6 +92,11 @@ const ProfileBtn = styled(Button).attrs({ as: "span" })`
   margin-top: 0px;
 `;
 
+const UnFollowBtn = styled(ProfileBtn)`
+  background-color: gray;
+  opacity: 0.8;
+`;
+
 interface Params {
   username: string;
 }
@@ -102,8 +108,17 @@ interface IPhoto {
 }
 
 interface SeeProfile {
-  isMe: boolean;
-  isFollowing: boolean;
+  id?: number;
+  isMe?: boolean;
+  isFollowing?: boolean;
+  username?: string;
+  avatar?: string;
+  totalFollowers?: number;
+  totalFollowing?: number;
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+  photos?: IPhoto;
 }
 
 const SEE_PROFILE_QUERY = gql`
@@ -127,21 +142,81 @@ const SEE_PROFILE_QUERY = gql`
   ${PHOTO_FRAGMENT}
 `;
 
+const FOLLOW_USER_MUTATION = gql`
+  mutation followUser($username: String) {
+    followUser(username: $username) {
+      ok
+      error
+    }
+  }
+`;
+
 const Profile = () => {
   const { username }: Params = useParams();
+  const myData = useUser();
+  const isFollowUpdate = (cache: any, { data }: any) => {
+    const {
+      followUser: { ok },
+    } = data;
+    if (ok) {
+      const { isFollowing } = cache.readFragment({
+        id: `User:${username}`,
+        fragment: gql`
+          fragment BSName on User {
+            isFollowing
+          }
+        `,
+      });
+      cache.modify({
+        id: `User:${username}`,
+        fields: {
+          isFollowing(pre: boolean) {
+            return !pre;
+          },
+          totalFollowers(pre: number) {
+            if (isFollowing) {
+              return pre - 1;
+            } else {
+              return pre + 1;
+            }
+          },
+        },
+      });
+      cache.modify({
+        id: `User:${myData?.data?.me?.username}`,
+        fields: {
+          totalFollowing(pre: number) {
+            if (isFollowing) {
+              return pre - 1;
+            } else {
+              return pre + 1;
+            }
+          },
+        },
+      });
+    }
+  };
+
   const { data, loading }: any = useQuery(SEE_PROFILE_QUERY, {
     variables: {
       username,
     },
   });
+  const [followUser] = useMutation(FOLLOW_USER_MUTATION, {
+    variables: { username },
+    update: isFollowUpdate,
+  });
+
   const getButton = ({ isMe, isFollowing }: SeeProfile) => {
     if (isMe) {
       return <ProfileBtn>Edit Profile</ProfileBtn>;
     }
     if (isFollowing) {
-      return <ProfileBtn>Unfollow</ProfileBtn>;
+      return <ProfileBtn onClick={() => followUser()}>Following</ProfileBtn>;
     } else {
-      return <ProfileBtn>Follow</ProfileBtn>;
+      return (
+        <UnFollowBtn onClick={() => followUser()}>Unfollowing</UnFollowBtn>
+      );
     }
   };
 
