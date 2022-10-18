@@ -8,7 +8,7 @@
 
 - [x] Log In / Sign up
 - [x] Feed
-- [ ] Profile
+- [x] Profile
 - [ ] See Hashtag
 
 - [ ] Username, Password, Email restriction (login and signup part in frontend and backend)
