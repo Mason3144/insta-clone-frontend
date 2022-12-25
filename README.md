@@ -1,4 +1,13 @@
-# Instaclone Web
+## Instagram Clone coding (Web frontend)
+
+React의 기초 사용법을 익히기 위한 코딩
+
+- React hook form
+- React router, React router dom
+- Styled component
+- Font awesome
+
+## 진행 현황
 
 - [x] Router
 - [x] Authentication
